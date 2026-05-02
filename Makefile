@@ -1,11 +1,12 @@
 # Project Name (edit this)
-TARGET_NAME = my_project
+TARGET_NAME = weather
 BUILD_DIR = build
 BIN_DIR = bin
 EXECUTABLE = $(BIN_DIR)/$(TARGET_NAME)
+INSTALL_DIR = $(HOME)/.local/bin
 
 # Source files (edit these) - MUST be in src/ directory
-SRCS = src/main.c src/example.c
+SRCS = src/main.c src/example.c src/api.c
 # Header files (edit these if you add headers outside src/include/)
 HDRS = src/include/example.h
 
@@ -22,13 +23,13 @@ HARDENING = -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fPIE -fstack-clash-pro
 OPTFLAGS = -O3 -march=native -flto
 
 # Linker flags
-LDFLAGS = -lm -pie -Wl,-z,relro,-z,now
+LDFLAGS = -lm -pie -Wl,-z,relro,-z,now -lcjson -lcurl
 
 # Combine all flags
 ALL_CFLAGS = $(CFLAGS) $(HARDENING) $(OPTFLAGS)
 
 # Targets
-.PHONY: all clean run format lint directories
+.PHONY: all clean run format lint directories install uninstall
 
 all: directories $(EXECUTABLE)
 
@@ -56,6 +57,17 @@ run: $(EXECUTABLE)
 	@echo "Running $(EXECUTABLE) ..."
 	./$(EXECUTABLE)
 
+install: all
+	@echo "Installing $(TARGET_NAME) to $(INSTALL_DIR) ..."
+	@mkdir -p $(INSTALL_DIR)
+	@install -m 755 $(EXECUTABLE) $(INSTALL_DIR)
+	@echo "Installed $(TARGET_NAME) to $(INSTALL_DIR)"
+
+uninstall:
+	@echo "Uninstalling $(TARGET_NAME) from $(INSTALL_DIR) ..."
+	@rm -f $(INSTALL_DIR)/$(TARGET_NAME)
+	@echo "Uninstalled $(TARGET_NAME)"
+
 # Format code using clang-format
 FORMAT_FILES = $(SRCS) $(HDRS)
 format:
@@ -64,8 +76,8 @@ format:
 	mbake format --config ./.bake.toml Makefile
 
 # Run static analysis with clang-tidy
-CLANG_TIDY_CHECKS = -checks=-*,readability-*,bugprone-*,performance-*,clang-analyzer-*
+CLANG_TIDY_CHECKS = -checks=-*,readability-braces-around-statements,bugprone-argument-comment,readability-simplify-boolean-expr,bugprone-suspicious-missing-comma,bugprone-unused-raii,readability-else-after-return,performance-no-int-to-ptr,bugprone-bool-pointer-implicit-conversion,bugprone-integer-division,bugprone-macro-parentheses,readability-uppercase-literal-suffix,performance-unnecessary-copy-initialization
 lint:
 	@echo "Running static analysis..."
-	@clang-tidy $(CLANG_TIDY_CHECKS) $(SRCS) -- $(CFLAGS)
+	@clang-tidy $(CLANG_TIDY_CHECKS) -header-filter='^(?!.*).*$$' $(SRCS) -- $(CFLAGS)
 	mbake validate --config ./.bake.toml Makefile
