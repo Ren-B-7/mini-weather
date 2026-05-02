@@ -1,60 +1,86 @@
-# Mini Project Template
+# mini-weather
 
-This repository serves as a template for creating new "mini-projects" in the series. It provides a standardized structure and common configurations to help you get started quickly.
+`mini-weather` is a simple command-line interface (CLI) tool for fetching current weather information for one or more cities. It uses the [Open-Meteo API](https://open-meteo.com/) for weather data and geocoding.
 
-## Project Structure
+## Features
 
--   **`src/`**: Contains your main source code files (`.c`).
-    -   **`include/`**: Contains your header files (`.h`).
--   **`bin/`**: The compiled executable will be placed here.
--   **`Makefile`**: Build system configuration.
--   **`.clang-format`**: Code formatting configuration.
--   **`.clang-tidy`**: Static analysis configuration.
--   **`.gitignore`**: Specifies intentionally untracked files that Git should ignore.
--   **`LICENSE`**: The project's license.
--   **`README.md`**: This file.
+- **Multi-city Support**: Fetch weather data for multiple cities simultaneously in parallel.
+- **Unit Selection**: Choose between metric (Celsius) and imperial (Fahrenheit) units.
+- **Detailed Info**: Displays current temperature and precipitation probability.
+- **Fast and Lightweight**: Written in C with minimal overhead.
 
-## Getting Started
+## Prerequisites
 
-1.  **Clone this repository:**
-    ```bash
-    git clone <repository_url> my-new-project
-    cd my-new-project
-    ```
-    Replace `<repository_url>` with the URL of this template repository.
+Before building `mini-weather`, ensure you have the following dependencies installed:
 
-2.  **Clean Git History (Optional but Recommended):**
-    If you want a fresh Git history for your new project, you can do the following:
-    ```bash
-    rm -rf .git
-    git init
-    git add .
-    git commit -m "Initial commit from template"
-    # Add your remote origin if you plan to push to GitHub or another remote
-    # git remote add origin <your_project_remote_url>
-    ```
+- `libcurl`: For making HTTP requests.
+- `libcjson`: For parsing JSON data.
+- `gcc`: C compiler.
+- `make`: Build system.
 
-3.  **Update Project-Specific Files:**
-    *   **`Makefile`**:
-        *   Edit the `TARGET_NAME` variable to your project's name.
-        *   Update the `SRCS` list to include all your `.c` files, ensuring they are prefixed with `src/`.
-        *   Review and adjust `CFLAGS` and `LDFLAGS` as needed.
-    *   **`README.md`**: Update this file to describe your specific project, its features, and any unique build instructions.
-    *   **Source Files**: Replace `src/main.c` and `src/include/example.h` with your project's actual source code. Add any other `.c` files to the `src/` directory and corresponding `.h` files to `src/include/`.
+On Debian/Ubuntu-based systems, you can install the dependencies with:
+```bash
+sudo apt-get install libcurl4-openssl-dev libcjson-dev build-essential
+```
 
-4.  **Build and Run:**
-    Use the provided `Makefile` commands:
-    ```bash
-    make all  # Build your project (executable will be in bin/)
-    make run  # Run your project
-    make clean # Clean build artifacts
-    ```
+## Building
 
-## Configuration Files
+To build the project, run:
 
--   **`.clang-format` & `.clang-tidy`**: These files are pre-configured for code style and basic linting. You can customize them to fit your preferences.
--   **`Makefile`**: A robust Makefile is provided. For projects with more complex build requirements (e.g., using libraries, custom build tools), you may need to modify this Makefile.
+```bash
+make all
+```
+
+The compiled executable will be located in the `bin/` directory.
+
+## Usage
+
+Run the `weather` command with the `--city` (or `-c`) flag followed by a comma-separated list of cities.
+
+```bash
+./bin/weather --city "New York,London,Tokyo"
+```
+
+### Options
+
+| Option | Shorthand | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `--city` | `-c` | Comma-separated list of city names. | (Required) |
+| `--units` | `-u` | Units to use: `metric` (Celsius) or `imperial` (Fahrenheit). | `metric` |
+| `--help` | `-h` | Display help message. | - |
+
+### Example
+
+```bash
+./bin/weather --city "San Francisco,Paris" --units imperial
+```
+
+Output:
+```
+San Francisco - 62.4 F - 0% precipitation
+Paris - 54.2 F - 10% precipitation
+```
+
+## Installation
+
+You can install the tool to your local bin directory (`~/.local/bin` by default) using:
+
+```bash
+make install
+```
+
+To uninstall:
+
+```bash
+make uninstall
+```
+
+## Development
+
+- **Format code**: `make format` (requires `clang-format`)
+- **Linting**: `make lint` (requires `clang-tidy`)
+- **Clean build artifacts**: `make clean`
 
 ## License
 
-This template is licensed under the MIT License.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
