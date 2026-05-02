@@ -6,9 +6,9 @@ EXECUTABLE = $(BIN_DIR)/$(TARGET_NAME)
 INSTALL_DIR = $(HOME)/.local/bin
 
 # Source files (edit these) - MUST be in src/ directory
-SRCS = src/main.c src/example.c src/api.c
+SRCS = src/main.c src/api.c
 # Header files (edit these if you add headers outside src/include/)
-HDRS = src/include/example.h
+HDRS =
 
 # Object files (placed in build/ directory)
 OBJS = $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
