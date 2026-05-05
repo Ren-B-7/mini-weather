@@ -48,6 +48,10 @@ $(EXECUTABLE): $(OBJS)
 	$(CC) $(ALL_CFLAGS) $(LDFLAGS) -o $(EXECUTABLE) $(OBJS)
 
 # Rule to clean up build artifacts
+test:
+	$(CC) -Itests/include tests/test_placeholder.c -o tests/runner
+	./tests/runner
+
 clean:
 	@echo "Cleaning up build artifacts..."
 	@rm -rf $(BUILD_DIR) $(BIN_DIR)
