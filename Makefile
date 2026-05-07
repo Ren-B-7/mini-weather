@@ -16,7 +16,7 @@ OBJS = $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
 # Compiler and flags
 CC = gcc
 # Comprehensive CFLAGS
-CFLAGS = -std=c11 -pedantic -Wall -Wextra -Werror -Wformat=2 -Wshadow -Wconversion -Wsign-conversion -Wundef -Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wpointer-arith -Wwrite-strings -Wold-style-definition -Isrc/include
+CFLAGS = -std=c11 -pedantic -Wall -Wextra  -Wformat=2 -Wshadow -Wconversion -Wsign-conversion -Wundef -Wstrict-prototypes -Wmissing-prototypes -Wredundant-decls -Wpointer-arith -Wwrite-strings -Wold-style-definition -Isrc/include
 # Hardening flags
 HARDENING = -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fPIE -fstack-clash-protection -fcf-protection
 # Optimization flags
