@@ -254,7 +254,8 @@ int set_cmp(const SimpleSet* left, const SimpleSet* right)
 {
 	if (left->used_nodes < right->used_nodes) {
 		return SET_RIGHT_GREATER;
-	} else if (right->used_nodes < left->used_nodes) {
+	}
+	if (right->used_nodes < left->used_nodes) {
 		return SET_LEFT_GREATER;
 	}
 	uint64_t i;
@@ -338,7 +339,8 @@ static int set_get_index(uint64_t hash, const SimpleSet* set, const char* key,
 		if (set->nodes[i] == NULL) {
 			*index = i;
 			return SET_FALSE; // not here OR first open slot
-		} else if (hash == set->nodes[i]->_hash && len == set->nodes[i]->_len &&
+		}
+		if (hash == set->nodes[i]->_hash && len == set->nodes[i]->_len &&
 		 memcmp(key, set->nodes[i]->_key, len) == 0) {
 			*index = i;
 			return SET_TRUE;

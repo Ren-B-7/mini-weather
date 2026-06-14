@@ -6,12 +6,12 @@ EXECUTABLE = $(BIN_DIR)/$(TARGET_NAME)
 INSTALL_DIR = $(HOME)/.local/bin
 
 # Source files (edit these) - MUST be in src/ directory
-SRCS = src/main.c src/api.c
+SRCS = src/main.c src/api.c src/include/set.c
 # Header files (edit these if you add headers outside src/include/)
 HDRS =
 
 # Object files (placed in build/ directory)
-OBJS = $(SRCS:src/%.c=$(BUILD_DIR)/%.o)
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/api.o $(BUILD_DIR)/set.o
 
 # Compiler and flags
 CC = gcc
@@ -38,6 +38,10 @@ directories:
 	@mkdir -p $(BIN_DIR) $(BUILD_DIR)
 
 # Rule to compile .c files into .o files in the build/ directory
+$(BUILD_DIR)/set.o: src/include/set.c
+	@echo "Compiling $< ..."
+	$(CC) $(ALL_CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/%.o: src/%.c
 	@echo "Compiling $< ..."
 	$(CC) $(ALL_CFLAGS) -c $< -o $@

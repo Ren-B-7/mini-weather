@@ -1,14 +1,36 @@
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "api.h"
+#include "include/minicli.h"
 
-static void print_help(const char* prog_name)
+typedef struct {
+	char* cities_str;
+	const char* units;
+} WeatherConfig;
+
+static int city_cb(int argc, char** argv, void* user_data)
 {
-	printf("Usage: %s --city <name1,name2,...> [--units <metric|imperial>]\n",
-	 prog_name);
+	WeatherConfig* config = (WeatherConfig*) user_data;
+	if (argc < 1) {
+		fprintf(stderr, "Error: City list missing.\n");
+		return 0;
+	}
+	config->cities_str = argv[0];
+	return 1;
+}
+
+static int units_cb(int argc, char** argv, void* user_data)
+{
+	WeatherConfig* config = (WeatherConfig*) user_data;
+	if (argc < 1) {
+		fprintf(stderr, "Error: Units missing.\n");
+		return 0;
+	}
+	config->units =
+	 (strcmp(argv[0], "imperial") == 0) ? "fahrenheit" : "celsius";
+	return 1;
 }
 
 static void print_weather(const char* city, cJSON* json, const char* units)
@@ -27,42 +49,36 @@ static void print_weather(const char* city, cJSON* json, const char* units)
 
 int main(int argc, char* argv[])
 {
-	char* cities_str = NULL;
-	const char* units = "celsius";
-	int opt;
-	struct option long_options[] = {{"city", required_argument, 0, 'c'},
-	    {"units", required_argument, 0, 'u'}, {"help", no_argument, 0, 'h'},
-	    {0, 0, 0, 0}};
+	WeatherConfig config = {NULL, "celsius"};
+	CliParser parser;
+	CliInitParams params = {"weather", "Weather forecast tool"};
+	cli_init(&parser, params);
 
-	while ((opt = getopt_long(argc, argv, "c:u:h", long_options, NULL)) != -1) {
-		switch (opt) {
-		case 'c':
-			cities_str = optarg;
-			break;
-		case 'u':
-			units =
-			 (strcmp(optarg, "imperial") == 0) ? "fahrenheit" : "celsius";
-			break;
-		case 'h':
-			print_help(argv[0]);
-			return EXIT_SUCCESS;
-		default:
-			print_help(argv[0]);
-			return EXIT_FAILURE;
-		}
-	}
+	cli_add_argument(&parser,
+	 (CliArgument) {"--city", "-c", "Cities to query (comma-separated)",
+	     city_cb, &config});
+	cli_add_argument(&parser,
+	 (CliArgument) {
+	     "--units", "-u", "Units (metric|imperial)", units_cb, &config});
 
-	if (!cities_str) {
+	cli_parse(&parser, argc, argv);
+
+	if (!config.cities_str) {
 		fprintf(stderr, "Error: City is required.\n");
-		print_help(argv[0]);
+		cli_print_help(&parser);
+		cli_destroy(&parser);
 		return EXIT_FAILURE;
 	}
+
+	char* cities_str = config.cities_str;
+	const char* units = config.units;
 
 	// Parse cities into an array
 	int city_count = 0;
 	size_t cities_str_len = strlen(cities_str);
 	char* cities_str_copy = malloc(cities_str_len + 1);
 	if (!cities_str_copy) {
+		cli_destroy(&parser);
 		return EXIT_FAILURE;
 	}
 	memcpy(cities_str_copy, cities_str, cities_str_len + 1);
@@ -90,6 +106,7 @@ int main(int argc, char* argv[])
 
 	free(results);
 	free(cities);
+	cli_destroy(&parser);
 
 	return EXIT_SUCCESS;
 }
